@@ -1,13 +1,13 @@
 package organization
 
 import (
-	"github.com/ikeisuke/sample-github-tool/organization/members"
-	"github.com/shurcooL/githubv4"
+	"github.com/ikeisuke/sample-github-tool/github/organization/members"
+	"github.com/ikeisuke/sample-github-tool/github/upstream"
 )
 
 // Organization organization
 type Organization struct {
-	client *githubv4.Client
+	client upstream.GraphQL
 	login  string
 }
 
@@ -19,7 +19,7 @@ func New(login string) *Organization {
 }
 
 // SetGitHubV4Client aaa
-func (o *Organization) SetGitHubV4Client(client *githubv4.Client) {
+func (o *Organization) SetGitHubV4Client(client upstream.GraphQL) {
 	o.client = client
 }
 

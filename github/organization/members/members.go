@@ -1,16 +1,16 @@
 package members
 
 import (
-	"context"
 	"os"
 
+	"github.com/ikeisuke/sample-github-tool/github/upstream"
 	"github.com/k0kubun/pp"
 	"github.com/shurcooL/githubv4"
 )
 
 // Members struct
 type Members struct {
-	client       *githubv4.Client
+	client       upstream.GraphQL
 	organization string
 	members      []Member
 }
@@ -32,7 +32,7 @@ type pageInfo struct {
 type edge struct {
 	Role githubv4.String
 	Node struct {
-		DatabaseId githubv4.Int
+		DatabaseID githubv4.Int
 		Name       githubv4.String
 		Login      githubv4.String
 		Email      githubv4.String
@@ -56,7 +56,7 @@ func New(organization string) *Members {
 }
 
 // SetGitHubV4Client aaa
-func (m *Members) SetGitHubV4Client(client *githubv4.Client) {
+func (m *Members) SetGitHubV4Client(client upstream.GraphQL) {
 	m.client = client
 }
 
@@ -84,19 +84,18 @@ func (m *Members) Load() {
 	}
 	i := 0
 	for {
-		err := m.client.Query(context.Background(), &query, variables)
+		err := m.client.Query(&query, variables)
 		if err != nil {
 			pp.Printf("%+v\n", err)
 			os.Exit(1)
 		}
-		//pp.Printf("%+v\n", query)
 		if !query.Organization.MembersWithRole.PageInfo.HasPreviousPage {
 			size := query.Organization.MembersWithRole.TotalCount
 			m.members = make([]Member, size, size)
 		}
 		for _, e := range query.Organization.MembersWithRole.Edges {
 			m.members[i] = Member{
-				ID:    int(e.Node.DatabaseId),
+				ID:    int(e.Node.DatabaseID),
 				Name:  string(e.Node.Name),
 				Login: string(e.Node.Login),
 				Email: string(e.Node.Email),

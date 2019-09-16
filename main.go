@@ -1,24 +1,23 @@
 package main
 
 import (
-	"context"
 	"os"
 
-	"github.com/shurcooL/githubv4"
-	"golang.org/x/oauth2"
-
-	"github.com/ikeisuke/sample-github-tool/organization"
+	"github.com/ikeisuke/sample-github-tool/github"
+	"github.com/k0kubun/pp"
 )
 
 func main() {
-	src := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
-	)
-	httpClient := oauth2.NewClient(context.Background(), src)
-	client := githubv4.NewClient(httpClient)
-
-	o := organization.New(os.Getenv("GITHUB_ORGANIZATION"))
-	o.SetGitHubV4Client(client)
+	g := github.New()
+	o := g.Organization(os.Getenv("GITHUB_ORGANIZATION_NAME"))
+	pp.Printf("%+v\n", o)
 	m := o.Members()
-	m.Load()
+	// m.Load()
+	pp.Printf("%+v\n", m)
+	r := g.Repository(os.Getenv("GITHUB_ORGANIZATION_NAME"), os.Getenv("GITHUB_REPOSITORY_NAME"))
+	pp.Printf("%+v\n", r)
+	c := r.Collaborators()
+	// c.Load()
+	pp.Printf("%+v\n", c)
+	// r.CreateIssue("test title", "test body \n new line")
 }
